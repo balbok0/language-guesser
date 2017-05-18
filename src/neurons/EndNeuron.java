@@ -12,15 +12,15 @@ public class EndNeuron extends Neuron {
 	}
 
 	@Override
-	public void process(Neuron[][] n)
+	public void process()
 	{
-		
+		super.setVal(Functions.sigmoid(super.getVal()));
 	}
 
 	//Basically ensures that output is between 0-1 (inclusive), because that's how probabilities look like
 	public double getVal()
 	{
-		return Functions.ReLU(Functions.sigmoid(super.getVal())-0.5);
+		return Functions.ReLU(super.getVal());
 	}
 
 }

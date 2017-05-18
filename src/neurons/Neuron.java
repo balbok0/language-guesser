@@ -2,11 +2,13 @@ package neurons;
 
 import java.util.ArrayList;
 
+import main.Functions;
+
 public class Neuron {
 
 	//TO DO:
-	/*
-	 * - Make a process method (loop through all out connections)
+	/* 
+	 * - Make a backpropagation support method (here?)
 	 */
 	
 	private double val;
@@ -19,15 +21,20 @@ public class Neuron {
 		outs = new ArrayList<>();
 	}
 	
-	public void process(Neuron[][] n) {
-		// TODO Auto-generated method stub
-		
+	//Loops through all the out connections, and adds values to neurons on the other side.  
+	public void process() 
+	{
+		for(Connection c : outs)
+		{
+			c.addValTo(val);
+		}
 	}
 	
+	//Zeros value, and all the errors of functions before.
 	public void reset()
 	{
 		val = 0;
-		for(Connection n : outs)
+		for(Connection n : ins)
 		{
 			n.zeroErr();
 		}
@@ -35,7 +42,8 @@ public class Neuron {
 	
 	
 //Getters
-	public double getVal() {
+	public double getVal() 
+	{
 		return val;
 	}
 
@@ -44,7 +52,13 @@ public class Neuron {
 		return name;
 	}
 	
-	
+
+//Setters
+
+	public void setVal(double s)
+	{
+		val = s;
+	}
 	
 //Adders
 	public void addVal(double add)

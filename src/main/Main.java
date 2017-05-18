@@ -28,7 +28,7 @@ public class Main {
 		 6 - Korean
 		 7 - Japanese
 		*/
-		int[] choices = {0, 1, 3, 4};
+		int[] choices = {2};
 		for(int c : choices)
 		{
 			wordLists.add(new WordList(basePath + langs[c] + ".txt")); 
