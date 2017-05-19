@@ -1,14 +1,14 @@
 package neurons;
 
+import java.util.ArrayList;
+
 public class Connection {
 
 	//TO DO:
 	/*
-	 * - weight adjustments (due to step size)
-	 * - derivative calculation
 	 * - weight bounded by -1 and 1 or not
-	 * 
 	 */
+	
 	private double error = 0;
 	private static double stepSize = 0.01;
 	private double weight;
@@ -20,6 +20,8 @@ public class Connection {
 		weight = Math.random()*2 - 1;
 		from = fr;
 		to = t;
+		fr.addOut(this);
+		t.addIn(this);
 	}
 
 	public Connection(Neuron fr, Neuron t, double weig)
@@ -27,6 +29,8 @@ public class Connection {
 		weight = weig;
 		from = fr;
 		to = t;
+		fr.addOut(this);
+		t.addIn(this);
 	}
 	
 	//Engine
@@ -35,13 +39,32 @@ public class Connection {
 		to.addVal(a*weight);
 	}
 	
+		//Adjusts a weight by a step size
+		//Then loops through all the connections of neuron it comes from.
+		//Kind of like a reversed tree - you start from output, not from inputs
+	public void adjust(double wholeErr)
+	{
+		if((wholeErr > 0 && error * from.getVal() < 0) || (wholeErr < 0 && error*from.getVal() > 0))
+		{
+			weight += stepSize;
+		}
+		else if((wholeErr > 0 && error * from.getVal() > 0) || (wholeErr < 0 && error*from.getVal() < 0))
+		{
+			weight -= stepSize;
+		}
+		ArrayList<Connection> cons = from.getIns();
+		for(Connection c : cons)
+		{
+			c.addErr(error*weight);
+			c.adjust(wholeErr);
+		}
+	}
 	
 	//Getters
 	public double getWeight()
 	{
 		return weight;
 	}
-
 
 	public Neuron getNeuronTo()
 	{
@@ -69,8 +92,8 @@ public class Connection {
 		error = 0;
 	}
 
-	public void addErr(double a)
+	public void addErr(double ad)
 	{
-		error += a;
+		error += ad;
 	}
 }

@@ -2,21 +2,16 @@ package neurons;
 
 import java.util.ArrayList;
 
-import main.Functions;
-
 public class Neuron {
 
-	//TO DO:
-	/* 
-	 * - Make a backpropagation support method (here?)
-	 */
 	
-	private double val;
+	private double val = 0;
 	private ArrayList<Connection> ins;
 	private ArrayList<Connection> outs;
 	private String name;
 	
 	public Neuron(String n) {
+		name = n;
 		ins = new ArrayList<>();
 		outs = new ArrayList<>();
 	}
@@ -52,6 +47,10 @@ public class Neuron {
 		return name;
 	}
 	
+	public ArrayList<Connection> getIns()
+	{
+		return ins;
+	}
 
 //Setters
 
@@ -73,17 +72,17 @@ public class Neuron {
 	
 	public void addIn(Neuron n)
 	{
-		ins.add(new Connection(n, this));
+		new Connection(n, this);
 	}
 	
 	public void addOut(Connection n)
 	{
 		outs.add(n);
 	}
-
+	
 	public void addOut(Neuron n)
 	{
-		outs.add(new Connection(this, n));
+		new Connection(this, n);
 	}
 
 }
