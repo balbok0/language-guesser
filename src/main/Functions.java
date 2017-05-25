@@ -15,4 +15,9 @@ public final class Functions {
 		}
 		return x;
 	}
+	
+	public static double sigmoidDerivative(double x)
+	{
+		return sigmoid(x)*(1-sigmoid(x));
+	}
 }

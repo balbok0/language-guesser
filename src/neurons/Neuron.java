@@ -52,7 +52,12 @@ public class Neuron {
 		return ins;
 	}
 
-//Setters
+	public ArrayList<Connection> getOuts()
+	{
+		return outs;
+	}
+
+	//Setters
 
 	public void setVal(double s)
 	{

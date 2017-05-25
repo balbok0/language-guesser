@@ -2,18 +2,26 @@ package neurons;
 
 import java.util.ArrayList;
 
+import main.Functions;
+import main.Main;
+
 public class Connection {
 
 	//TO DO:
 	/*
-	 * - weight bounded by -1 and 1 or not
+	 * - fix adding values to farther connections (to include sigmoid)
+	 * - do the sigmoid derivative
 	 */
 	
-	private double error = 0;
-	private static double stepSize = 0.01;
+	private double errDer[] = new double[Main.NUMBEROFLANGS];;
+	private boolean[] isConnected = new boolean[Main.NUMBEROFLANGS];
+	private final double stepSize = 0.001;
 	private double weight;
 	private Neuron from;
 	private Neuron to;
+	private final double upperBound = 1;
+	private final double lowerBound = -1;
+
 	
 	public Connection(Neuron fr, Neuron t) 
 	{
@@ -24,7 +32,7 @@ public class Connection {
 		t.addIn(this);
 	}
 
-	public Connection(Neuron fr, Neuron t, double weig)
+	public Connection(Neuron fr, Neuron t, double weig, int NofLangs)
 	{
 		weight = weig;
 		from = fr;
@@ -39,61 +47,88 @@ public class Connection {
 		to.addVal(a*weight);
 	}
 	
-		//Adjusts a weight by a step size
-		//Then loops through all the connections of neuron it comes from.
-		//Kind of like a reversed tree - you start from output, not from inputs
-	public void adjust(double wholeErr)
+	
+	
+		//Loops through all the 'in' connections of neuron it comes from.
+	public void backpropagate()
 	{
-		if((wholeErr > 0 && error * from.getVal() < 0) || (wholeErr < 0 && error*from.getVal() > 0))
+		ArrayList<Connection> loop = from.getIns();
+		
+		for(int i = 0; i < loop.size(); i++)
 		{
-			weight += stepSize;
-		}
-		else if((wholeErr > 0 && error * from.getVal() > 0) || (wholeErr < 0 && error*from.getVal() < 0))
-		{
-			weight -= stepSize;
-		}
-		ArrayList<Connection> cons = from.getIns();
-		for(Connection c : cons)
-		{
-			c.addErr(error*weight);
-			c.adjust(wholeErr);
+			for(int ei = 0; ei < errDer.length && isConnected[ei]; ei++)
+			{
+				loop.get(i).addErr(ei, errDer[ei] * weight);
+			}
 		}
 	}
 	
+	//Adjusts a weight by a step size
+	public void adjust(double[] pred, int[] act)
+	{
+		double sum = 0;
+		for(int i = 0; i < errDer.length; i++)
+		{
+			sum += Functions.sigmoidDerivative(pred[i])*(2*pred[i]-2*act[i])*errDer[i]*from.getVal();
+		}
+		if(sum > 0)
+		{
+			weight -= stepSize;
+		}
+		else if(sum < 0)
+		{
+			weight += stepSize;
+		}
+		notCrossBoundary();
+	}
+	
+		private void notCrossBoundary()
+		{
+			if(weight >= upperBound)
+			{
+				weight = upperBound;
+			}
+			else if(weight <= lowerBound)
+			{
+				weight = lowerBound;
+			}
+		}
+	
 	//Getters
+	
 	public double getWeight()
 	{
 		return weight;
 	}
+	
 
 	public Neuron getNeuronTo()
 	{
 		return to;
 	}
 	
+	
 	public Neuron getNeuronFrom()
 	{
 		return from;
 	}
 	
-	public static double getStepSize()
-	{
-		return stepSize;
-	}
 	
-	//Setters
-	public static void setStepSize(double sS)
-	{
-		stepSize = sS;
-	}
+	//Changing Error
 	
 	public void zeroErr()
 	{
-		error = 0;
+		for(int i = 0; i < errDer.length; i++)
+		{
+			errDer[i] = 0;
+			isConnected[i] = false;
+		}
 	}
 
-	public void addErr(double ad)
+	
+	public void addErr(int index, double ad)
 	{
-		error += ad;
+		isConnected[index] = true;
+		errDer[index] += ad;
 	}
 }
